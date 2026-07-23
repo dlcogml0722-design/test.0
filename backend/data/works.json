@@ -1,0 +1,82 @@
+﻿[
+  {
+    "id": "itaewon-class",
+    "title": { "ko": "이태원 클라쓰", "en": "Itaewon Class", "ja": "梨泰院クラス" },
+    "platform": "webtoon",
+    "genre": "drama",
+    "thumbnail": "assets/images/ㅇ.jpeg",
+    "color": "#ff6b35",
+    "emoji": "🍺",
+    "tags": ["drama", "youth", "restaurant"]
+  },
+  {
+    "id": "yumis-cells",
+    "title": { "ko": "유미의 세포들", "en": "Yumi's Cells", "ja": "ユミの細胞たち" },
+    "platform": "webtoon",
+    "genre": "romance",
+    "thumbnail": "assets/images/ㅇㅁ.jpeg",
+    "color": "#ff69b4",
+    "emoji": "🧠",
+    "tags": ["romance", "cafe"]
+  },
+  {
+    "id": "solo-leveling",
+    "title": { "ko": "나 혼자만 레벨업", "en": "Solo Leveling", "ja": "俺だけレベルアップな件" },
+    "platform": "webnovel",
+    "genre": "action",
+    "thumbnail": "assets/images/ㄴ.jpeg",
+    "color": "#6c5ce7",
+    "emoji": "⚔️",
+    "tags": ["action", "fantasy", "landmark"]
+  },
+  {
+    "id": "true-beauty",
+    "title": { "ko": "여신강림", "en": "True Beauty", "ja": "女神降臨" },
+    "platform": "webtoon",
+    "genre": "romance",
+    "thumbnail": "assets/images/ㅇㅅ.jpeg",
+    "color": "#fd79a8",
+    "emoji": "💄",
+    "tags": ["romance", "youth", "cafe"]
+  },
+  {
+    "id": "secretary-kim",
+    "title": { "ko": "김비서가 왜 그럴까", "en": "What's Wrong with Secretary Kim", "ja": "キム秘書はいったいなぜ" },
+    "platform": "webnovel",
+    "genre": "romance",
+    "thumbnail": "assets/images/ㄱㅂㅅ.jpeg",
+    "color": "#e17055",
+    "emoji": "👔",
+    "tags": ["romance", "drama", "building"]
+  },
+  {
+    "id": "youngest-son",
+    "title": { "ko": "재벌집 막내아들", "en": "Reborn Rich", "ja": "財閥家の末っ子" },
+    "platform": "webnovel",
+    "genre": "drama",
+    "thumbnail": "assets/images/ㅈ.jpeg",
+    "color": "#fdcb6e",
+    "emoji": "💰",
+    "tags": ["drama", "thriller", "building"]
+  },
+  {
+    "id": "omniscient-reader",
+    "title": { "ko": "전지적 독자 시점", "en": "Omniscient Reader's Viewpoint", "ja": "全知的読者の視点で" },
+    "platform": "webnovel",
+    "genre": "fantasy",
+    "thumbnail": "assets/images/ㅈㄷㅅ.jpeg",
+    "color": "#00b894",
+    "emoji": "📖",
+    "tags": ["fantasy", "action", "landmark"]
+  },
+  {
+    "id": "garbage-time",
+    "title": { "ko": "가비지타임", "en": "Garbage Time", "ja": "ガベージタイム" },
+    "platform": "webtoon",
+    "genre": "thriller",
+    "thumbnail": "assets/images/ㄱ.jpeg",
+    "color": "#636e72",
+    "emoji": "🏀",
+    "tags": ["thriller", "street"]
+  }
+]

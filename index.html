@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="description"
+    content="K-웹툰, 웹소설의 실제 배경지를 한국 지도 위에서 찾아보는 성지순례 서비스. Find real-world K-Webtoon & Web Novel locations on a map.">
+  <meta name="theme-color" content="#0a0a1a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>나만의 성지순례 | K-Webtoon Pilgrimage Map</title>
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <!-- App CSS -->
+  <link rel="stylesheet" href="css/index.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+
+<body>
+  <div class="app">
+
+    <!-- ══ Header ══ -->
+    <header class="header" id="header">
+      <div class="header__logo">
+        <span class="header__logo-icon">⛩️</span>
+        <span class="header__logo-text" data-i18n="appName">나만의 성지순례</span>
+      </div>
+      <div class="header__actions">
+        <button class="add-spot-btn" id="openAddSpotBtn">
+          <span>➕</span>
+          <span data-i18n="addSpot">장소 제보</span>
+        </button>
+        <div class="lang-switcher">
+          <button class="lang-switcher__btn active" data-lang="ko">KO</button>
+          <button class="lang-switcher__btn" data-lang="en">EN</button>
+          <button class="lang-switcher__btn" data-lang="ja">JA</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- ══ Search Bar ══ -->
+    <div class="search-bar" id="searchBar">
+      <span class="search-bar__icon">🔍</span>
+      <input type="text" class="search-bar__input" id="searchInput" data-i18n-placeholder="searchPlaceholder"
+        placeholder="작품명을 검색하세요..." autocomplete="off">
+      <button class="search-bar__clear" id="searchClear">✕</button>
+      <button class="search-bar__filter-btn" id="filterToggleBtn" title="Filter">
+        ⚙️
+      </button>
+    </div>
+
+    <!-- ══ Work Chips (Horizontal Scroll) ══ -->
+    <div class="work-chips" id="workChips">
+      <!-- Rendered by JS -->
+    </div>
+
+    <!-- ══ Filter Panel ══ -->
+    <div class="filter-panel" id="filterPanel">
+      <div class="filter-panel__section">
+        <div class="filter-panel__label" data-i18n="tagFilter">태그 필터</div>
+        <div class="chips" id="tagChips">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+      <div class="filter-panel__section">
+        <div class="radius-control" id="radiusControl">
+          <div class="radius-control__header">
+            <span class="radius-control__label" data-i18n="radiusLabel">검색 반경</span>
+            <span class="radius-control__value" id="radiusValue">50.0km</span>
+          </div>
+          <input type="range" class="radius-slider" id="radiusSlider" min="500" max="50000" value="50000" step="500">
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ Map ══ -->
+    <div class="map-container">
+      <div id="map"></div>
+    </div>
+
+    <!-- ══ GPS Button ══ -->
+    <button class="gps-btn" id="gpsBtn" title="My Location">
+      📍
+    </button>
+
+    <!-- ══ Bottom Sheet ══ -->
+    <div class="bottom-sheet" id="bottomSheet">
+      <div class="bottom-sheet__handle">
+        <div class="bottom-sheet__handle-bar"></div>
+      </div>
+      <div class="bottom-sheet__header">
+        <span class="bottom-sheet__title" id="bottomSheetTitle" data-i18n="spotListTitle">성지순례 스팟</span>
+        <span class="bottom-sheet__count" id="spotCount">0건</span>
+      </div>
+      <div class="bottom-sheet__content" id="spotList">
+        <div class="spot-card" data-spot-id="spot-001" onclick="openSpotDetail('spot-001')">
+          <img class="spot-card__image" src="assets/images/ㅇ.jpeg" alt="">
+          <div class="spot-card__info">
+            <div class="spot-card__work">이태원 클라쓰</div>
+            <div class="spot-card__name">단밤 포차 1호점 (카페 오리올)</div>
+            <div class="spot-card__scene">단밤 포차 1호점 - 새로이와 멤버들이 힘을 모아 시작하는 창업 공간</div>
+            <div class="spot-card__meta">
+              <span class="spot-card__distance">📍 서울 용산구 신흥로20길 43</span>
+            </div>
+          </div>
+        </div>
+        <div class="spot-card" data-spot-id="spot-002" onclick="openSpotDetail('spot-002')">
+          <img class="spot-card__image" src="assets/images/ㅇ.jpeg" alt="">
+          <div class="spot-card__info">
+            <div class="spot-card__work">이태원 클라쓰</div>
+            <div class="spot-card__name">녹사평 육교</div>
+            <div class="spot-card__scene">새로이가 이태원에 오면 생각에 잠기는 남산 뷰 육교 장면</div>
+            <div class="spot-card__meta">
+              <span class="spot-card__distance">📍 서울 용산구 녹사평대로 195</span>
+            </div>
+          </div>
+        </div>
+        <div class="spot-card" data-spot-id="spot-003" onclick="openSpotDetail('spot-003')">
+          <img class="spot-card__image" src="assets/images/ㅇ.jpeg" alt="">
+          <div class="spot-card__info">
+            <div class="spot-card__work">이태원 클라쓰</div>
+            <div class="spot-card__name">남산 백범광장공원 (성곽길 데이트 엔딩 장소)</div>
+            <div class="spot-card__scene">새로이와 이서가 남산 타워를 바라보며 손을 잡고 걷던 성곽길 및 엔딩 입맞춤 장면</div>
+            <div class="spot-card__meta">
+              <span class="spot-card__distance">📍 서울 중구 퇴계로8길 49-4</span>
+            </div>
+          </div>
+        </div>
+        <div class="spot-card" data-spot-id="spot-005" onclick="openSpotDetail('spot-005')">
+          <img class="spot-card__image" src="assets/images/ㅇㅁ.jpeg" alt="">
+          <div class="spot-card__info">
+            <div class="spot-card__work">유미의 세포들</div>
+            <div class="spot-card__name">경주식당 (상수동 한옥 고깃집)</div>
+            <div class="spot-card__scene">5화 - 두 사람 사이에 차가운 분위기가 감돌던 한식당 식사 장면</div>
+            <div class="spot-card__meta">
+              <span class="spot-card__distance">📍 서울 마포구 와우산로13길 49-7</span>
+            </div>
+          </div>
+        </div>
+        <div class="spot-card" data-spot-id="spot-006" onclick="openSpotDetail('spot-006')">
+          <img class="spot-card__image" src="assets/images/ㅇㅁ.jpeg" alt="">
+          <div class="spot-card__info">
+            <div class="spot-card__work">유미의 세포들</div>
+            <div class="spot-card__name">카페 라디오엠 (Radio M - 첫 만남 데이트 카페)</div>
+            <div class="spot-card__scene">유미와 구웅이 처음 만나 쑥스럽게 대화를 이어가던 카페 테이블</div>
+            <div class="spot-card__meta">
+              <span class="spot-card__distance">📍 서울 종로구 삼청로 2길 37</span>
+            </div>
+          </div>
+        </div>
+        <div class="spot-card" data-spot-id="spot-019" onclick="openSpotDetail('spot-019')">
+          <img class="spot-card__image" src="assets/images/ㅇㅁ.jpeg" alt="">
+          <div class="spot-card__info">
+            <div class="spot-card__work">유미의 세포들</div>
+            <div class="spot-card__name">유미의 아파트 (부천 벚꽃마을)</div>
+            <div class="spot-card__scene">구웅이 밤마다 유미를 아파트 앞까지 바래다주고 고백하던 장소</div>
+            <div class="spot-card__meta">
+              <span class="spot-card__distance">📍 경기도 부천시 원미구 상동 벚꽃마을</span>
+            </div>
+          </div>
+        </div>
+        <div class="spot-card" data-spot-id="spot-007" onclick="openSpotDetail('spot-007')">
+          <img class="spot-card__image" src="assets/images/ㄴ.jpeg" alt="">
+          <div class="spot-card__info">
+            <div class="spot-card__work">나 혼자만 레벨업</div>
+            <div class="spot-card__name">합정역 3번 출구 (첫 인스턴스 던전 입구)</div>
+            <div class="spot-card__scene">진우가 지하철역 출입구로 들어가 첫 퀘스트 던전에 도전하던 장면</div>
+            <div class="spot-card__meta">
+              <span class="spot-card__distance">📍 서울 마포구 양화로 45</span>
+            </div>
+          </div>
+        </div>
+        <div class="spot-card" data-spot-id="spot-008" onclick="openSpotDetail('spot-008')">
+          <img class="spot-card__image" src="assets/images/ㄴ.jpeg" alt="">
+          <div class="spot-card__info">
+            <div class="spot-card__work">나 혼자만 레벨업</div>
+            <div class="spot-card__name">광화문 광장 (헌터 협회 및 세종대왕상 대전투 배경)</div>
+            <div class="spot-card__scene">진우가 세종대왕상 앞 광화문 하늘 위로 수만 그림자 군단을 소환하던 전투 배경</div>
+            <div class="spot-card__meta">
+              <span class="spot-card__distance">📍 서울 종로구 세종대로 172</span>
+            </div>
+          </div>
+        </div>
+        <div class="spot-card" data-spot-id="spot-020" onclick="openSpotDetail('spot-020')">
+          <img class="spot-card__image" src="assets/images/ㄴ.jpeg" alt="">
+          <div class="spot-card__info">
+            <div class="spot-card__work">나 혼자만 레벨업</div>
+            <div class="spot-card__name">잠실 롯데월드타워 (S급 헌터 마천루 모티브)</div>
+            <div class="spot-card__scene">진우가 강력한 힘을 깨닫고 초고층 빌딩 정상에서 서울 야경을 바라보던 장면</div>
+            <div class="spot-card__meta">
+              <span class="spot-card__distance">📍 서울 송파구 올림픽로 300</span>
+            </div>
+          </div>
+        </div>
+        <div class="spot-card" data-spot-id="spot-009" onclick="openSpotDetail('spot-009')">
+          <img class="spot-card__image" src="assets/images/ㅇㅅ.jpeg" alt="">
+          <div class="spot-card__info">
+            <div class="spot-card__work">여신강림</div>
+            <div class="spot-card__name">왕자 만화방 (와이앤아니마 - 수호와 주경의 아지트)</div>
+            <div class="spot-card__scene">민낯 주경이 수호와 호러 만화책을 사이에 두고 재회하던 만화방 장면</div>
+            <div class="spot-card__meta">
+              <span class="spot-card__distance">📍 서울 종로구 윤보선길 31</span>
+            </div>
+          </div>
+        </div>
+        <div class="spot-card" data-spot-id="spot-010" onclick="openSpotDetail('spot-010')">
+          <img class="spot-card__image" src="assets/images/ㅇㅅ.jpeg" alt="">
+          <div class="spot-card__info">
+            <div class="spot-card__work">여신강림</div>
+            <div class="spot-card__name">새봄고등학교 (연세대학교 연희관)</div>
+            <div class="spot-card__scene">여신으로 변신한 주경이가 새봄고 캠퍼스를 걸어 등교하던 명장면</div>
+            <div class="spot-card__meta">
+              <span class="spot-card__distance">📍 서울 서대문구 연세로 50</span>
+            </div>
+          </div>
+        </div>
+        <div class="spot-card" data-spot-id="spot-021" onclick="openSpotDetail('spot-021')">
+          <img class="spot-card__image" src="assets/images/ㅇㅅ.jpeg" alt="">
+          <div class="spot-card__info">
+            <div class="spot-card__work">여신강림</div>
+            <div class="spot-card__name">익선동 콤콤오락실 (주경이와 친구들의 레트로 데이트)</div>
+            <div class="spot-card__scene">서준이와 주경이가 티격태격 게임 배틀을 벌이던 오락실 장면</div>
+            <div class="spot-card__meta">
+              <span class="spot-card__distance">📍 서울 종로구 수표로28길 23-6</span>
+            </div>
+          </div>
+        </div>
+        <div class="spot-card" data-spot-id="spot-011" onclick="openSpotDetail('spot-011')">
+          <img class="spot-card__image" src="assets/images/ㄱㅂㅅ.jpeg" alt="">
+          <div class="spot-card__info">
+            <div class="spot-card__work">김비서가 왜 그럴까</div>
+            <div class="spot-card__name">김미소 집 (갤러리 카페 의외의 조합)</div>
+            <div class="spot-card__scene">이영준 부회장이 미소를 집 앞까지 바래다주고 고백하던 옥탑방 계단</div>
+            <div class="spot-card__meta">
+              <span class="spot-card__distance">📍 서울 용산구 소월로20길 55</span>
+            </div>
+          </div>
+        </div>
+        <div class="spot-card" data-spot-id="spot-012" onclick="openSpotDetail('spot-012')">
+          <img class="spot-card__image" src="assets/images/ㄱㅂㅅ.jpeg" alt="">
+          <div class="spot-card__info">
+            <div class="spot-card__work">김비서가 왜 그럴까</div>
+            <div class="spot-card__name">에버랜드 (영준의 프라이빗 놀이공원 통째 대관 데이트)</div>
+            <div class="spot-card__scene">밤하늘 화려한 불꽃놀이와 회전목마 앞에서 펼쳐진 영준과 미소의 로맨틱 데이트</div>
+            <div class="spot-card__meta">
+              <span class="spot-card__distance">📍 경기도 용인시 처인구 포곡읍 에버랜드로 199</span>
+            </div>
+          </div>
+        </div>
+        <div class="spot-card" data-spot-id="spot-022" onclick="openSpotDetail('spot-022')">
+          <img class="spot-card__image" src="assets/images/ㄱㅂㅅ.jpeg" alt="">
+          <div class="spot-card__info">
+            <div class="spot-card__work">김비서가 왜 그럴까</div>
+            <div class="spot-card__name">상암동 DDMC (유명그룹 본사 사옥)</div>
+            <div class="spot-card__scene">영준이 전용 엘리베이터에서 내리고 미소가 수석비서 업무를 챙기던 로비 현장</div>
+            <div class="spot-card__meta">
+              <span class="spot-card__distance">📍 서울 마포구 매봉산로 75</span>
+            </div>
+          </div>
+        </div>
+        <div class="spot-card" data-spot-id="spot-013" onclick="openSpotDetail('spot-013')">
+          <img class="spot-card__image" src="assets/images/ㅈ.jpeg" alt="">
+          <div class="spot-card__info">
+            <div class="spot-card__work">재벌집 막내아들</div>
+            <div class="spot-card__name">정심재 (순양그룹 진양철 회장 자택 - 옛 부산시장 관사 도모헌)</div>
+            <div class="spot-card__scene">진도준이 할아버지 진양철 회장의 신임을 얻으며 가족 모임에 참석하던 정심재 웅장한 대문</div>
+            <div class="spot-card__meta">
+              <span class="spot-card__distance">📍 부산광역시 수영구 황령산로7번길 60</span>
+            </div>
+          </div>
+        </div>
+        <div class="spot-card" data-spot-id="spot-014" onclick="openSpotDetail('spot-014')">
+          <img class="spot-card__image" src="assets/images/ㅈ.jpeg" alt="">
+          <div class="spot-card__info">
+            <div class="spot-card__work">재벌집 막내아들</div>
+            <div class="spot-card__name">삼청동 카페 보드레 (진도준과 서민영의 한옥 비밀 아지트)</div>
+            <div class="spot-card__scene">도준이 민영과 함께 커피를 마시며 미라클 투자 전략을 세우던 아늑한 한옥 테라스</div>
+            <div class="spot-card__meta">
+              <span class="spot-card__distance">📍 서울 종로구 화동 138-7</span>
+            </div>
+          </div>
+        </div>
+        <div class="spot-card" data-spot-id="spot-023" onclick="openSpotDetail('spot-023')">
+          <img class="spot-card__image" src="assets/images/ㅈ.jpeg" alt="">
+          <div class="spot-card__info">
+            <div class="spot-card__work">재벌집 막내아들</div>
+            <div class="spot-card__name">그랜드 하얏트 서울 (순양그룹 창업 및 반도체 선언 행사장)</div>
+            <div class="spot-card__scene">진양철 회장이 기자회견을 열어 순양의 미래 반도체 사업 투자를 강력히 선언하던 볼룸</div>
+            <div class="spot-card__meta">
+              <span class="spot-card__distance">📍 서울 용산구 소월로 322</span>
+            </div>
+          </div>
+        </div>
+        <div class="spot-card" data-spot-id="spot-015" onclick="openSpotDetail('spot-015')">
+          <img class="spot-card__image" src="assets/images/ㅈㄷㅅ.jpeg" alt="">
+          <div class="spot-card__info">
+            <div class="spot-card__work">전지적 독자 시점</div>
+            <div class="spot-card__name">지하철 3호선 동호대교 (첫 번째 시나리오 한강 교량)</div>
+            <div class="spot-card__scene">3호선 열차 탈선 후 붉은 강물이 흐르던 동호대교 위에서 옥수역으로 걸어가던 장면</div>
+            <div class="spot-card__meta">
+              <span class="spot-card__distance">📍 서울 성동구 옥수동 ~ 강남구 압구정동</span>
+            </div>
+          </div>
+        </div>
+        <div class="spot-card" data-spot-id="spot-016" onclick="openSpotDetail('spot-016')">
+          <img class="spot-card__image" src="assets/images/ㅈㄷㅅ.jpeg" alt="">
+          <div class="spot-card__info">
+            <div class="spot-card__work">전지적 독자 시점</div>
+            <div class="spot-card__name">3호선 금호역 (김독자 일행의 첫 번째 메인 거점)</div>
+            <div class="spot-card__scene">독자가 금호역 지하 역사 안에서 철두그룹과 대립하고 식량을 배분하던 거점 장면</div>
+            <div class="spot-card__meta">
+              <span class="spot-card__distance">📍 서울 성동구 동호로 지하 180</span>
+            </div>
+          </div>
+        </div>
+        <div class="spot-card" data-spot-id="spot-024" onclick="openSpotDetail('spot-024')">
+          <img class="spot-card__image" src="assets/images/ㅈㄷㅅ.jpeg" alt="">
+          <div class="spot-card__info">
+            <div class="spot-card__work">전지적 독자 시점</div>
+            <div class="spot-card__name">대한극장 및 충무로역 (시나리오 3 백청교도 전투 무대)</div>
+            <div class="spot-card__scene">독자가 충무로역 영화관 상영관 안에서 유중혁과 인카운터하여 공방을 벌이던 장면</div>
+            <div class="spot-card__meta">
+              <span class="spot-card__distance">📍 서울 중구 퇴계로 212</span>
+            </div>
+          </div>
+        </div>
+        <div class="spot-card" data-spot-id="spot-017" onclick="openSpotDetail('spot-017')">
+          <img class="spot-card__image" src="assets/images/ㄱ.jpeg" alt="">
+          <div class="spot-card__info">
+            <div class="spot-card__work">가비지타임</div>
+            <div class="spot-card__name">부산중앙고등학교 (지상고등학교 농구부 실화 모티브)</div>
+            <div class="spot-card__scene">성준수, 기상호, 공태성이 땀 흘리며 연습하던 부산 산복도로 체육관 농구 코트 모티브</div>
+            <div class="spot-card__meta">
+              <span class="spot-card__distance">📍 부산광역시 중구 망양로 309</span>
+            </div>
+          </div>
+        </div>
+        <div class="spot-card" data-spot-id="spot-018" onclick="openSpotDetail('spot-018')">
+          <img class="spot-card__image" src="assets/images/ㄱ.jpeg" alt="">
+          <div class="spot-card__info">
+            <div class="spot-card__work">가비지타임</div>
+            <div class="spot-card__name">김천 중앙고등학교 (장도고등학교 캠퍼스 모티브)</div>
+            <div class="spot-card__scene">최종수와 임승대가 혹독한 훈련을 거치며 득점포를 가동하던 전설의 체육관 코트</div>
+            <div class="spot-card__meta">
+              <span class="spot-card__distance">📍 경상북도 김천시 시청로 105</span>
+            </div>
+          </div>
+        </div>
+        <div class="spot-card" data-spot-id="spot-025" onclick="openSpotDetail('spot-025')">
+          <img class="spot-card__image" src="assets/images/ㄱ.jpeg" alt="">
+          <div class="spot-card__info">
+            <div class="spot-card__work">가비지타임</div>
+            <div class="spot-card__name">영광 홍농초등학교 체육관 (작중 쌍용기 전국대회 경기장 모델)</div>
+            <div class="spot-card__scene">지상고가 장도고와 결승전에서 마지막 버저비터 3점슛을 날리던 전설의 경기장</div>
+            <div class="spot-card__meta">
+              <span class="spot-card__distance">📍 전라남도 영광군 홍농읍 홍농로 478</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ Bottom Navigation ══ -->
+    <nav class="bottom-nav" id="bottomNav">
+      <button class="bottom-nav__item active" data-view="map" onclick="switchView('map')">
+        <span class="bottom-nav__icon">🗺️</span>
+        <span class="bottom-nav__label" data-i18n="tabMap">지도</span>
+      </button>
+      <button class="bottom-nav__item" data-view="list" onclick="switchView('list')">
+        <span class="bottom-nav__icon">📋</span>
+        <span class="bottom-nav__label" data-i18n="tabList">리스트</span>
+      </button>
+      <button class="bottom-nav__item" data-view="scrap" onclick="switchView('scrap')">
+        <span class="bottom-nav__icon">❤️</span>
+        <span class="bottom-nav__label" data-i18n="tabScrap">스크랩</span>
+        <span class="bottom-nav__badge" id="scrapBadge" style="display:none">0</span>
+      </button>
+    </nav>
+
+    <!-- ══ Spot Detail Modal ══ -->
+    <div class="spot-detail" id="spotDetail">
+      <div class="spot-detail__overlay"></div>
+      <div class="spot-detail__content">
+        <div class="spot-detail__image-wrap">
+          <div class="spot-detail__image"></div>
+          <div class="spot-detail__image-overlay"></div>
+          <button class="spot-detail__close" onclick="closeSpotDetail()">✕</button>
+        </div>
+        <div class="spot-detail__body">
+          <span class="spot-detail__work-tag"></span>
+          <h2 class="spot-detail__name"></h2>
+          <p class="spot-detail__scene"></p>
+
+          <div class="spot-detail__info-grid">
+            <div class="spot-detail__info-item">
+              <span class="spot-detail__info-label">📍 거리</span>
+              <span class="spot-detail__info-value spot-detail__distance-value">--</span>
+            </div>
+            <div class="spot-detail__info-item">
+              <span class="spot-detail__info-label">🕐 운영시간</span>
+              <span class="spot-detail__info-value spot-detail__hours-value">--</span>
+            </div>
+          </div>
+
+          <p class="spot-detail__description">
+            <span class="spot-detail__description-text"></span>
+          </p>
+
+          <div class="spot-detail__address">
+            <span>📌</span>
+            <span class="spot-detail__address-text"></span>
+          </div>
+
+          <div class="spot-detail__tags"></div>
+
+          <div style="margin-bottom: var(--space-3);">
+            <div class="filter-panel__label" data-i18n="travelTime">예상 소요시간</div>
+          </div>
+          <div class="nav-info"></div>
+
+          <div class="spot-detail__actions">
+            <button class="detail-btn detail-btn--secondary" id="detailScrapBtn">
+              🤍 <span data-i18n="scrap">스크랩</span>
+            </button>
+            <button class="detail-btn detail-btn--secondary" id="detailShareBtn">
+              🔗 <span data-i18n="share">공유</span>
+            </button>
+            <button class="detail-btn detail-btn--primary" id="detailNavBtn">
+              🗺️ <span data-i18n="navigate">지도에서 보기</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ Custom Spot Registration Modal ══ -->
+    <div class="custom-spot-modal" id="customSpotModal">
+      <div class="custom-spot-modal__overlay" id="closeAddSpotOverlay"></div>
+      <div class="custom-spot-modal__content">
+        <div class="custom-spot-modal__header">
+          <h3 class="custom-spot-modal__title" data-i18n="addSpotTitle">나만의 성지 장소 제보 & AI 등록</h3>
+          <button class="custom-spot-modal__close" id="closeAddSpotBtn">✕</button>
+        </div>
+        <form class="custom-spot-form" id="customSpotForm">
+          <div class="form-group">
+            <label data-i18n="workTitleLabel">작품명 (예: 가비지타임)</label>
+            <input type="text" id="spotWorkTitle" required placeholder="웹툰/웹소설 이름을 입력하세요">
+          </div>
+          <div class="form-group">
+            <label data-i18n="spotNameLabel">장소명 (예: 성수 카페거리)</label>
+            <input type="text" id="spotNameInput" required placeholder="성지 장소의 명칭을 입력하세요">
+          </div>
+          <div class="form-group">
+            <label data-i18n="spotAddressLabel">주소 또는 위치 명칭 (예: 서울 성동구 / 홍대입구)</label>
+            <input type="text" id="spotAddressInput" required placeholder="지역, 주소 또는 건물을 입력하세요">
+          </div>
+          <div class="form-group">
+            <label data-i18n="spotDescLabel">장소 설명 & 작품 속 등장 장면</label>
+            <textarea id="spotDescInput" rows="3" required placeholder="작품에서 어떤 장면으로 나왔는지 작성해주세요"></textarea>
+          </div>
+          <button type="submit" class="submit-spot-btn">
+            <span>✨</span>
+            <span data-i18n="submitSpot">AI 위치 분석 및 지도 등록</span>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- ══ Toast ══ -->
+    <div class="toast" id="toast"></div>
+
+  </div>
+
+  <!-- ══ Scripts ══ -->
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- App Modules (order matters) -->
+  <script src="js/i18n.js?v=9"></script>
+  <script src="js/data.js?v=9"></script>
+  <script src="js/map.js?v=9"></script>
+  <script src="js/filter.js?v=9"></script>
+  <script src="js/scrap.js?v=9"></script>
+  <script src="js/navigation.js?v=9"></script>
+  <script src="js/app.js?v=9"></script>
+</body>
+
+</html>

@@ -1,0 +1,174 @@
+/* ============================================
+   나만의 성지순례 - Responsive
+   ============================================ */
+
+/* === Tablet (768px+) === */
+@media (min-width: 768px) {
+  :root {
+    --bottom-sheet-peek: 460px;
+  }
+
+  .header {
+    padding: 0 var(--space-6);
+  }
+
+  .search-bar {
+    left: var(--space-6);
+    right: var(--space-6);
+    max-width: 500px;
+  }
+
+  .work-chips {
+    padding: var(--space-2) var(--space-6);
+  }
+
+  .filter-panel {
+    left: var(--space-6);
+    right: auto;
+    width: 380px;
+  }
+
+  .bottom-sheet {
+    left: auto;
+    right: 0;
+    width: 400px;
+    border-radius: var(--radius-xl) 0 0 0;
+    height: calc(100vh - var(--header-height) - var(--bottom-nav-height));
+    max-height: calc(100vh - var(--header-height) - var(--bottom-nav-height));
+    transform: translateY(calc(100% - var(--bottom-sheet-peek)));
+  }
+
+  .bottom-sheet.expanded {
+    transform: translateY(0);
+  }
+
+  .spot-card__image {
+    width: 110px;
+    height: 110px;
+  }
+
+  .spot-detail__content {
+    max-width: 500px;
+    left: 50%;
+    transform: translateX(-50%);
+    animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+}
+
+/* === Desktop (1024px+) === */
+@media (min-width: 1024px) {
+  .header {
+    padding: 0 var(--space-8);
+  }
+
+  .search-bar {
+    left: 50%;
+    transform: translateX(-50%);
+    right: auto;
+    max-width: 560px;
+    width: 100%;
+  }
+
+  .search-bar:focus-within {
+    max-width: 600px;
+  }
+
+  .work-chips {
+    justify-content: center;
+    padding: var(--space-2) var(--space-8);
+  }
+
+  .filter-panel {
+    left: 50%;
+    transform: translateX(-50%);
+    width: 440px;
+  }
+
+  .filter-panel.open {
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .bottom-sheet {
+    width: 440px;
+  }
+
+  .bottom-nav {
+    max-width: none;
+  }
+
+  .spot-detail__content {
+    max-width: 560px;
+  }
+
+  .spot-detail__image-wrap {
+    height: 280px;
+  }
+}
+
+/* === Large Desktop (1440px+) === */
+@media (min-width: 1440px) {
+  .bottom-sheet {
+    width: 480px;
+  }
+}
+
+/* === Mobile Specific (< 768px) === */
+@media (max-width: 767px) {
+  .spot-detail__info-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .spot-detail__image-wrap {
+    height: 180px;
+  }
+
+  .nav-info {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* === Small Mobile (< 375px) === */
+@media (max-width: 374px) {
+  :root {
+    --text-base: 0.875rem;
+    --text-lg: 1rem;
+    --text-xl: 1.25rem;
+  }
+
+  .spot-card__image {
+    width: 72px;
+    height: 72px;
+  }
+
+  .spot-card__name {
+    font-size: var(--text-sm);
+  }
+}
+
+/* === Safe Area (iPhone notch) === */
+@supports (padding: env(safe-area-inset-bottom)) {
+  .bottom-nav {
+    padding-bottom: env(safe-area-inset-bottom);
+    height: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom));
+  }
+
+  .bottom-sheet {
+    bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom));
+  }
+
+  .toast {
+    bottom: calc(var(--bottom-nav-height) + var(--space-4) + env(safe-area-inset-bottom));
+  }
+}
+
+/* === Reduced Motion === */
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
